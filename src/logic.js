@@ -1,5 +1,4 @@
 import { curry } from './curry.js';
-import { reduce } from './iterate.js';
 
 const either = curry((a, b) => a || b);
 
@@ -24,12 +23,10 @@ const id = (v) => v;
 const always = (v) => () => v;
 
 const arrEqual = curry((a, b) => {
-	return a.length !== b.length
-		? false
-		: reduce((p, c, i) => {
-				if (p == false || c != b[i]) return false;
-				else return true;
-		  }, true)(a);
+	if (a.length !== b.length) {
+		return false;
+	}
+	return a.every((val, index) => val === b[index]);
 });
 
 const when = curry((a, b) => {
@@ -53,4 +50,20 @@ const ifElse = curry((a, b, c) => {
 	};
 });
 
-export { either, both, not, gt, gte, lt, lte, equal, equalStrict, arrEqual, id, always, when, unless, ifElse };
+export {
+	either,
+	both,
+	not,
+	gt,
+	gte,
+	lt,
+	lte,
+	equal,
+	equalStrict,
+	arrEqual,
+	id,
+	always,
+	when,
+	unless,
+	ifElse
+};

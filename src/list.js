@@ -1,15 +1,6 @@
 import { curry } from './curry.js';
 
-const zipWith = curry((f, a, b) => {
-	const result = [],
-		end = Math.min(a.length, b.length);
-	let index = 0;
-	while (index < end) {
-		result.push(f(a[index], b[index]));
-		++index;
-	}
-	return result;
-});
+const zipWith = curry((f, a, b) => a.map((x, i) => f(x, b[i])));
 
 const zip = zipWith((a, b) => [a, b]);
 
@@ -17,16 +8,16 @@ const join = curry((s, arr) => arr.join(s));
 
 const slice = curry((start, end, arr) => arr.splice(start, end));
 
-const take = curry((pos, arr) => slice(0, pos - 1, arr));
+const take = curry((pos, arr) => slice(0, pos, arr));
 
 const takeWhile = curry((f, arr) => {
 	const result = [],
 		end = arr.length;
-	let index = 0;
-	while (index < end) {
-		if (f(arr[index])) result.push(arr[index]);
-		else break;
-		++index;
+	for (let i = 0; i < end; i++) {
+		if (!f(arr[i])) {
+			break;
+		}
+		result.push(arr[i]);
 	}
 	return result;
 });
@@ -49,25 +40,9 @@ const dropWhile = curry((f, arr) => {
 	return result;
 });
 
-const allCheck = curry((f, arr) => {
-	let index = 0;
-	const end = arr.length;
-	while (index < end) {
-		if (!f(arr[index])) return false;
-		++index;
-	}
-	return true;
-});
+const allCheck = curry((f, arr) => arr.every(f));
 
-const anyCheck = curry((f, arr) => {
-	let index = 0;
-	const end = arr.length;
-	while (index < end) {
-		if (f(arr[index])) return true;
-		++index;
-	}
-	return false;
-});
+const anyCheck = curry((f, arr) => arr.some(f));
 
 const concat = curry((a, b) => {
 	if (Array.isArray(a)) return a.concat(b);
@@ -80,9 +55,9 @@ const tail = (arr) => arr[arr.length - 1];
 
 const dropHead = (arr) => drop(1, arr);
 
-const dropTail = (arr) => arr.splice(0, -1);
+const dropTail = (arr) => arr.splice(0, arr.length - 1);
 
-const includes = curry((a, b) => a.includes(b));
+const includes = curry((a, b) => b.includes(a));
 
 function reverse(arr) {
 	const result = [];
@@ -94,4 +69,22 @@ function reverse(arr) {
 	return result;
 }
 
-export { zipWith, zip, join, slice, take, takeWhile, drop, dropWhile, allCheck, anyCheck, concat, head, tail, dropHead, dropTail, includes, reverse };
+export {
+	zipWith,
+	zip,
+	join,
+	slice,
+	take,
+	takeWhile,
+	drop,
+	dropWhile,
+	allCheck,
+	anyCheck,
+	concat,
+	head,
+	tail,
+	dropHead,
+	dropTail,
+	includes,
+	reverse
+};
