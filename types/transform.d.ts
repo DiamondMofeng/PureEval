@@ -5,15 +5,12 @@ import type { CurryWarpper } from "./curry";
 */
 type Fn = (...args: any[]) => any
 
-type Pipeable<Funcs extends Fn[], Prev = () => any> =
-  Funcs extends [infer First, ...infer Remaining extends Fn[]]
+type Pipeable<Funcs extends Fn[], Prev extends Fn = () => any> =
+  Funcs extends [infer First extends Fn, ...infer Remaining extends Fn[]]
   ? [
-    Prev extends (...args: any[]) => infer R ?
-    First extends (...args: infer A) => any ?
-    A[0] extends R ? First
-    : (arg: R) => any // this is what the type of `First` shoule be.
-    : (arg: R) => any
-    : never
+    ReturnType<Prev> extends Parameters<First>[0]
+    ? First
+    : (arg: ReturnType<Prev>) => any
     ,
     ...Pipeable<Remaining, First>
   ]
@@ -31,16 +28,14 @@ export const pipe: <Funcs extends Fn[]>(
   never;
 
 // the reverse version of `Pipeable`
-type Composeable<Funcs extends Fn[], Prev = () => any> =
-  Funcs extends [...infer Remaining extends Fn[], infer Last]
+type Composeable<Funcs extends Fn[], Prev extends Fn = () => any> =
+  Funcs extends [...infer Remaining extends Fn[], infer Last extends Fn]
   ? [
-    ...Pipeable<Remaining, Last>,
-    Prev extends (...args: any[]) => infer R ?
-    Last extends (...args: infer A) => any ?
-    A[0] extends R ? Last
-    : (arg: R) => any
-    : (arg: R) => any
-    : never
+    ...Composeable<Remaining, Last>
+    ,
+    ReturnType<Prev> extends Parameters<Last>[0]
+    ? Last
+    : (arg: ReturnType<Prev>) => any
   ]
   : [];
 
